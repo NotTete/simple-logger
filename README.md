@@ -30,7 +30,6 @@ int main() {
 // example.c
 ``` 
 Output:
-$${\color{red}Welcome \space \color{lightblue}To \space \color{orange}Stackoverflow}$$
 ```
 
 [17:35:13][FATAL] example.c:13 This is a fatal error
