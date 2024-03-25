@@ -31,7 +31,6 @@ int main() {
 ``` 
 Output:
 ```
-
 [17:35:13][FATAL] example.c:13 This is a fatal error
 [17:35:13][ERROR] example.c:14 This is an error
 [17:35:13][WARNING] example.c:15 This is a warning
