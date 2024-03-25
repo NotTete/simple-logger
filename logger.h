@@ -2,6 +2,7 @@
 #define __LOGGER_H
 
 #include <stdio.h>
+#include <stdarg.h>
 #include <time.h>
 
 #define LOGGER_LEVEL_DISABLE 1
@@ -26,103 +27,103 @@
 #define __LOGGER_ENABLED_DEBUG __LOGGER_ENABLED(LOGGER_LEVEL_DEBUG) && !NDEBUG
 
 #if __LOGGER_ENABLED_FATAL
-    #define logger_fatal(msg) __logger_inner_fatal(__LINE__, __FILE__, msg)
+    #define logger_fatal(msg) __LOGGER_INNER_FATAL_PRINT(msg)
+    #define logger_fatal_va(msg, ...) __LOGGER_INNER_FATAL_PRINT_VA(msg, __VA_ARGS__)
 #else
     #define logger_fatal(msg)
+    #define logger_fatal_va(msg, ...)
 #endif
 
 #if __LOGGER_ENABLED_ERROR
-    #define logger_error(msg) __logger_inner_error(__LINE__, __FILE__, msg)
+    #define logger_error(msg) __LOGGER_INNER_ERROR_PRINT(msg)
+    #define logger_error_va(msg, ...) __LOGGER_INNER_ERROR_PRINT_VA(msg, __VA_ARGS__)
 #else
     #define logger_error(msg)
+    #define logger_error_va(msg, ...)
 #endif
 
 #if __LOGGER_ENABLED_WARNING
-    #define logger_warning(msg) __logger_inner_warning(__LINE__, __FILE__, msg)
+    #define logger_warning(msg) __LOGGER_INNER_WARNING_PRINT(msg)
+    #define logger_warning_va(msg, ...) __LOGGER_INNER_WARNING_PRINT_VA(msg, __VA_ARGS__)
 #else
     #define logger_warning(msg)
+    #define logger_warning_va(msg, ...)
 #endif
 
 #if __LOGGER_ENABLED_INFO
-    #define logger_info(msg) __logger_inner_info(__LINE__, __FILE__, msg)
+    #define logger_info(msg) __LOGGER_INNER_INFO_PRINT(msg)
+    #define logger_info_va(msg, ...) __LOGGER_INNER_INFO_PRINT_VA(msg, __VA_ARGS__)
 #else
     #define logger_info(msg)
+    #define logger_info_va(msg, ...)
 #endif
 
 #if __LOGGER_ENABLED_DEBUG
-    #define logger_debug(msg) __logger_inner_debug(__LINE__, __FILE__, msg)
+    #define logger_debug(msg) __LOGGER_INNER_DEBUG_PRINT(msg)
+    #define logger_debug_va(msg, ...) __LOGGER_INNER_DEBUG_PRINT_VA(msg, __VA_ARGS__)
 #else
     #define logger_debug(msg)
-#endif 
+    #define logger_debug_va(msg, ...)
+#endif
 
-extern inline void __logger_inner_fatal(const int line, const char* file, const char* msg) {
-    time_t t = time(NULL);
-    struct tm* ts = localtime(&t);
-    printf(
-        "\e[1m\e[38:5:88m[%02d:%02d:%02d][FATAL]\e[34m %s:%d\e[0m %s\n", 
-        ts->tm_hour,
-        ts->tm_min, 
-        ts->tm_sec, 
-        file,
-        line,
-        msg
-    );
+
+extern inline struct tm* __logger_get_time() {
+    time_t t = time(NULL); 
+    return localtime(&t);
+} 
+
+// Multiple argument print
+
+#define __LOGGER_INNER_PRINT_VA(destination, type, color, ...) {                 \
+    struct tm* time = __logger_get_time();                                       \
+    fprintf(destination, "\e[1m%s[%02d:%02d:%02d][%s] \e[34m%s:%d \e[0m",        \
+    color, time->tm_hour, time->tm_min, time->tm_sec, type, __FILE__, __LINE__); \
+    fprintf(destination, __VA_ARGS__);                                           \
+    fprintf(destination, "\n");                                                  \
 }
 
-extern inline void __logger_inner_error(const int line, const char* file, const char* msg) {
-    time_t t = time(NULL);
-    struct tm* ts = localtime(&t);
-    printf(
-        "\e[1m\e[91m[%02d:%02d:%02d][ERROR]\e[34m %s:%d\e[0m %s\n", 
-        ts->tm_hour,
-        ts->tm_min, 
-        ts->tm_sec, 
-        file,
-        line,
-        msg
-    );
+// Single argument print
+
+#define __LOGGER_INNER_PRINT(destination, type, color, msg) {                    \
+    struct tm* time = __logger_get_time();                                       \
+    fprintf(destination, "\e[1m%s[%02d:%02d:%02d][%s] \e[34m%s:%d \e[0m",        \
+    color, time->tm_hour, time->tm_min, time->tm_sec, type, __FILE__, __LINE__); \
+    fprintf(destination, msg);                                                   \
+    fprintf(destination, "\n");                                                  \
 }
 
-extern inline void __logger_inner_warning(const int line, const char* file, const char* msg) {
-    time_t t = time(NULL);
-    struct tm* ts = localtime(&t);
-    printf(
-        "\e[1m\e[33m[%02d:%02d:%02d][WARNING]\e[34m %s:%d\e[0m %s\n", 
-        ts->tm_hour,
-        ts->tm_min, 
-        ts->tm_sec, 
-        file,
-        line,
-        msg
-    );
-}
+// Single argument macros
 
-extern inline void __logger_inner_info(const int line, const char* file, const char* msg) {
-    time_t t = time(NULL);
-    struct tm* ts = localtime(&t);
-    printf(
-        "\e[1m\e[36m[%02d:%02d:%02d][INFO]\e[34m %s:%d\e[0m %s\n", 
-        ts->tm_hour,
-        ts->tm_min, 
-        ts->tm_sec, 
-        file,
-        line,
-        msg
-    );
-}
+#define __LOGGER_INNER_FATAL_PRINT(msg) \
+    __LOGGER_INNER_PRINT(stderr, "FATAL", "\e[38:5:88m", msg) \
 
-extern inline void __logger_inner_debug(const int line, const char* file, const char* msg) {
-    time_t t = time(NULL);
-    struct tm* ts = localtime(&t);
-    printf(
-        "\e[1m\e[32m[%02d:%02d:%02d][DEBUG]\e[34m %s:%d\e[0m %s\n", 
-        ts->tm_hour,
-        ts->tm_min, 
-        ts->tm_sec, 
-        file,
-        line,
-        msg
-    );
-}
+#define __LOGGER_INNER_ERROR_PRINT(msg) \
+    __LOGGER_INNER_PRINT(stderr, "ERROR", "\e[91m", msg)
+
+#define __LOGGER_INNER_WARNING_PRINT(msg) \
+    __LOGGER_INNER_PRINT(stdout, "WARNING", "\e[33m", msg)
+
+#define __LOGGER_INNER_INFO_PRINT(msg) \
+    __LOGGER_INNER_PRINT(stdout, "INFO", "\e[36m", msg)
+
+#define __LOGGER_INNER_DEBUG_PRINT(msg) \
+    __LOGGER_INNER_PRINT(stdout, "DEBUG", "\e[32m", msg)
+
+// Multiple argument macros
+
+#define __LOGGER_INNER_FATAL_PRINT_VA(msg, ...) \
+    __LOGGER_INNER_PRINT_VA(stderr, "FATAL", "\e[38:5:88m", msg, __VA_ARGS__)
+
+#define __LOGGER_INNER_ERROR_PRINT_VA(msg, ...) \
+    __LOGGER_INNER_PRINT_VA(stderr, "ERROR", "\e[91m", msg, __VA_ARGS__)
+
+#define __LOGGER_INNER_WARNING_PRINT_VA(msg, ...) \
+    __LOGGER_INNER_PRINT_VA(stdout, "WARNING", "\e[33m", msg, __VA_ARGS__)
+
+#define __LOGGER_INNER_INFO_PRINT_VA(msg, ...) \
+    __LOGGER_INNER_PRINT_VA(stdout, "INFO", "\e[36m", msg, __VA_ARGS__)
+
+#define __LOGGER_INNER_DEBUG_PRINT_VA(msg, ...) \
+    __LOGGER_INNER_PRINT_VA(stdout, "DEBUG", "\e[32m", msg, __VA_ARGS__)
 
 #endif
