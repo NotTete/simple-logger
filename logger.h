@@ -1,5 +1,5 @@
-#ifndef __SIMPLE_LOGGER_H
-#define __SIMPLE_LOGGER_H
+#ifndef __LOGGER_H
+#define __LOGGER_H
 
 #include <stdio.h>
 #include <time.h>
