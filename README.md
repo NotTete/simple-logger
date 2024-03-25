@@ -37,7 +37,7 @@ Output:
 [17:35:13][INFO] example.c:16 This is information
 [17:35:13][DEBUG] example.c:20 This is debug information
 ```
-### Test
+## Test
 ```bash
 git clone https://github.com/NotTete/simple-logger.git
 cd ./simple-logger
