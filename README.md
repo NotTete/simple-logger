@@ -1,5 +1,5 @@
 # Simple logger
-This a simple header-only console logger made in C for my personal projects.
+This a simple header-only console logger I made in C for my personal projects.
 
 
 
@@ -27,12 +27,22 @@ int main() {
     //#define NDEBUG
     logger_debug("This is debug information");
 }
-```
+// example.c
+``` 
 Output:
+$${\color{red}Welcome \space \color{lightblue}To \space \color{orange}Stackoverflow}$$
 ```
+
 [17:35:13][FATAL] example.c:13 This is a fatal error
 [17:35:13][ERROR] example.c:14 This is an error
 [17:35:13][WARNING] example.c:15 This is a warning
 [17:35:13][INFO] example.c:16 This is information
 [17:35:13][DEBUG] example.c:20 This is debug information
+```
+### Test
+If you want to test it:
+```bash
+git clone https://github.com/NotTete/simple-logger.git
+cd ./simple-logger
+make
 ```
