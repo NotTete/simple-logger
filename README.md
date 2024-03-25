@@ -39,7 +39,6 @@ Output:
 [17:35:13][DEBUG] example.c:20 This is debug information
 ```
 ### Test
-If you want to test it:
 ```bash
 git clone https://github.com/NotTete/simple-logger.git
 cd ./simple-logger
