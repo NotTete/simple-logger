@@ -66,16 +66,11 @@
     #define logger_debug_va(msg, ...)
 #endif
 
-
-extern inline struct tm* __logger_get_time() {
-    time_t t = time(NULL); 
-    return localtime(&t);
-} 
-
 // Multiple argument print
 
 #define __LOGGER_INNER_PRINT_VA(destination, type, color, ...) {                 \
-    struct tm* time = __logger_get_time();                                       \
+    time_t t = time(NULL);                                                       \
+    struct tm* time = localtime(&t);                                             \
     fprintf(destination, "\e[1m%s[%02d:%02d:%02d][%s] \e[34m%s:%d \e[0m",        \
     color, time->tm_hour, time->tm_min, time->tm_sec, type, __FILE__, __LINE__); \
     fprintf(destination, __VA_ARGS__);                                           \
@@ -85,7 +80,8 @@ extern inline struct tm* __logger_get_time() {
 // Single argument print
 
 #define __LOGGER_INNER_PRINT(destination, type, color, msg) {                    \
-    struct tm* time = __logger_get_time();                                       \
+    time_t t = time(NULL);                                                       \
+    struct tm* time = localtime(&t);                                             \
     fprintf(destination, "\e[1m%s[%02d:%02d:%02d][%s] \e[34m%s:%d \e[0m",        \
     color, time->tm_hour, time->tm_min, time->tm_sec, type, __FILE__, __LINE__); \
     fprintf(destination, msg);                                                   \
